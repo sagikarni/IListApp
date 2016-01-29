@@ -2,6 +2,10 @@
 // http://go.microsoft.com/fwlink/?LinkID=397705
 // To debug code on page load in Ripple or on Android devices/emulators: launch your app, set breakpoints, 
 // and then run "window.location.reload()" in the JavaScript Console.
+
+class AppSettings {
+    public static browser: InAppBrowser;
+}
 module IListApp {
     "use strict";
 
@@ -16,6 +20,34 @@ module IListApp {
             document.addEventListener('resume', onResume, false);
 
             // TODO: Cordova has been loaded. Perform any initialization that requires Cordova here.
+            AppSettings.browser = window.open('http://192.168.1.16:9876/default.aspx', '_blank', 'titlebar=no,toolbar=no,location=no,status=no,menubar=no,scrollbars=no,resizable=no');
+            navigator.splashscreen.show();
+            AppSettings.browser.addEventListener("loadstop", function () {
+                navigator.splashscreen.hide();
+                pollForSocialShare();
+            });
+        }
+
+        function pollForSocialShare() {
+            AppSettings.browser.executeScript({ code: "localStorage.setItem( 'doShare', '' );" }, null);
+            var loop = setInterval(function () {
+                AppSettings.browser.executeScript(
+                    {
+                        code: "localStorage.getItem( 'doShare' )"
+                    },
+                    function (values) {
+                        var name = values[0];
+                        if (name) {
+                            AppSettings.browser.executeScript(
+                                {
+                                    code: "localStorage.setItem( 'doShare', '' );"
+                                } , null);
+                            clearInterval(loop);
+                            (<any>(window.plugins)).socialsharing.share('My message');
+                        }
+                    }
+                );
+            }, 500);
         }
 
         function onPause() {
@@ -24,6 +56,7 @@ module IListApp {
 
         function onResume() {
             // TODO: This application has been reactivated. Restore application state here.
+            pollForSocialShare();
         }
 
     }
