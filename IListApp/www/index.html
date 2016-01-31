@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html>
+<html style="background-color:yellow">
 <head>
     <meta charset="utf-8" />
 
@@ -7,18 +7,24 @@
         Customize the content security policy in the meta tag below as needed. Add 'unsafe-inline' to default-src to enable inline JavaScript.
         For details, see http://go.microsoft.com/fwlink/?LinkID=617521
     -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: https://ssl.gstatic.com 'unsafe-eval'; style-src 'self' 'unsafe-inline'; media-src *">
-    <title>IListApp</title>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; frame-src 'self' http://192.168.1.11:9876">
+        <title>IListApp</title>
 
     <!-- IListApp references -->
     <link href="css/index.css" rel="stylesheet" />
 </head>
-<body>
-    <p>Hello, your application is ready!</p>
+<body style="height:100%;width:100%;background-color:gray">
+    
 
     <!-- Cordova reference, this is added to your app when it's built. -->
     <script src="cordova.js"></script>
     <script src="scripts/platformOverrides.js"></script>
     <script src="scripts/appBundle.js"></script>
+    <script>
+
+  
+    </script>
 </body>
+
+
 </html>
