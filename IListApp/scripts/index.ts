@@ -19,15 +19,30 @@ module IListApp {
             document.addEventListener('pause', onPause, false);
             document.addEventListener('resume', onResume, false);
 
-            navigator.splashscreen.show();
+          //  navigator.splashscreen.show();
 
             var iframe = document.createElement('iframe');
             iframe.src = "http://192.168.1.11:9876/default.aspx";
-            iframe.width = window.outerWidth.toString();
-            iframe.height = window.outerHeight.toString();
+            iframe.width = "100%";//window.outerWidth.toString();
+            iframe.height = "100%";//window.outerHeight.toString();
+            iframe.scrolling = "no";
+            iframe.vspace = 0;
+            iframe.border = "0px";
+            iframe.frameBorder = "0";
+            iframe.frameSpacing = "0";
+            iframe.style.overflow = "hiddden";
+            iframe.style.border = "none";
+            iframe.style.margin = "0px";
+            iframe.style.padding = "0px";
+            iframe.style.backgroundColor = "red";
             iframe.id = "iframe";
+            iframe.vspace = 0;
+            iframe.marginHeight = "0px";
+            iframe.scrolling = "false";
+            iframe.id = "iframe";
+           document.body.appendChild(iframe);
 
-            document.body.appendChild(iframe);
+ 
 
 
             var eventMethod = window.addEventListener ? "addEventListener" : "attachEvent";
@@ -38,10 +53,11 @@ module IListApp {
             eventer(messageEvent, function (e) {
                 console.log('parent received message!:  ', e.data);
                 if (e.data == "share")
-                    (<any>(window.plugins)).socialsharing.share('My message');
+                    (<any>(window.plugins)).socialsharing.share('*****************************\n*****************************\nhttp://ynet.co.il\n*****************************\n*****************************');
                 else
                     navigator.splashscreen.hide();
             }, false);
+            
             // TODO: Cordova has been loaded. Perform any initialization that requires Cordova here.
             //AppSettings.browser = window.open('http://192.168.1.11:9876/default.aspx', '_blank', 'titlebar=no,toolbar=no,location=no,status=no,menubar=no,scrollbars=no,resizable=no');
             //navigator.splashscreen.show();
