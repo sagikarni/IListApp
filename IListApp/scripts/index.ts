@@ -54,17 +54,18 @@ module IListApp {
             var messageEvent = eventMethod == "attachEvent" ? "onmessage" : "message";
             
             // Listen to message from child window
-            eventer(messageEvent, function (e) {
-               
-                console.log('parent received message!:  ', e.data);
-            
-                if (e.data == "share")
+            eventer(messageEvent, (e: MessageEvent) => {
+              
+                var crossDoaminMessage = <CrossDoaminMessage>e.data;
+                 console.log('parent received message!:  ', e.data);
+                 
+                if (crossDoaminMessage.messageType == MessageType.WhatsUpShare)
                     (<any>(window.plugins)).socialsharing.share('*****************************\n*****************************\nhttp://ynet.co.il\n*****************************\n*****************************');
-                else if (e.data == "loaded") {
-                    win.postMessage("hostedInApp", "*");
+                else if (crossDoaminMessage.messageType == MessageType.DocumentLoaded ) {
+                    win.postMessage(CrossDoaminMessage.CreateMessageWithoutContent(MessageType.IsHostedInApp), "*");
                     navigator.splashscreen.hide();
                 }
-                else if (e.data == "facebookConnect") {
+                else if (crossDoaminMessage.messageType == MessageType.FacebookLogin) {
                     FacebookHelper.login();
                 }
             }, false);
@@ -180,6 +181,33 @@ module IListApp {
             }
         }
     }
+
+    enum MessageType {
+        DocumentLoaded = 1,
+        IsHostedInApp = 2,
+        WhatsUpShare = 3,
+        FacebookLogin = 4,
+    }
+
+    class CrossDoaminMessage {
+        public messageType: MessageType;
+
+        public content: any;
+
+        constructor(messageType: MessageType) {
+            this.messageType = messageType;
+        }
+        public static CreateMessageWithoutContent(messageType: MessageType): CrossDoaminMessage {
+            return new CrossDoaminMessage(messageType);
+        }
+        public static CreateMessageContent(messageType: MessageType, content: any): CrossDoaminMessage {
+            var crossDoaminMessage = new CrossDoaminMessage(messageType);
+            crossDoaminMessage.content = content;
+            return crossDoaminMessage;
+        }
+
+    }
+
 
     window.onload = function () {
         Application.initialize();

@@ -47,14 +47,15 @@ var IListApp;
             var messageEvent = eventMethod == "attachEvent" ? "onmessage" : "message";
             // Listen to message from child window
             eventer(messageEvent, function (e) {
+                var crossDoaminMessage = e.data;
                 console.log('parent received message!:  ', e.data);
-                if (e.data == "share")
+                if (crossDoaminMessage.messageType == MessageType.WhatsUpShare)
                     (window.plugins).socialsharing.share('*****************************\n*****************************\nhttp://ynet.co.il\n*****************************\n*****************************');
-                else if (e.data == "loaded") {
-                    win.postMessage("hostedInApp", "*");
+                else if (crossDoaminMessage.messageType == MessageType.DocumentLoaded) {
+                    win.postMessage(CrossDoaminMessage.CreateMessageWithoutContent(MessageType.IsHostedInApp), "*");
                     navigator.splashscreen.hide();
                 }
-                else if (e.data == "facebookConnect") {
+                else if (crossDoaminMessage.messageType == MessageType.FacebookLogin) {
                     FacebookHelper.login();
                 }
             }, false);
@@ -158,6 +159,27 @@ var IListApp;
             }
         };
         return FacebookHelper;
+    }());
+    var MessageType;
+    (function (MessageType) {
+        MessageType[MessageType["DocumentLoaded"] = 1] = "DocumentLoaded";
+        MessageType[MessageType["IsHostedInApp"] = 2] = "IsHostedInApp";
+        MessageType[MessageType["WhatsUpShare"] = 3] = "WhatsUpShare";
+        MessageType[MessageType["FacebookLogin"] = 4] = "FacebookLogin";
+    })(MessageType || (MessageType = {}));
+    var CrossDoaminMessage = (function () {
+        function CrossDoaminMessage(messageType) {
+            this.messageType = messageType;
+        }
+        CrossDoaminMessage.CreateMessageWithoutContent = function (messageType) {
+            return new CrossDoaminMessage(messageType);
+        };
+        CrossDoaminMessage.CreateMessageContent = function (messageType, content) {
+            var crossDoaminMessage = new CrossDoaminMessage(messageType);
+            crossDoaminMessage.content = content;
+            return crossDoaminMessage;
+        };
+        return CrossDoaminMessage;
     }());
     window.onload = function () {
         Application.initialize();
