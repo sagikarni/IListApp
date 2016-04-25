@@ -1,17 +1,15 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<widget xmlns:cdv="http://cordova.apache.org/ns/1.0" xmlns:vs="http://schemas.microsoft.com/appx/2014/htmlapps" id="io.cordova.myappe076ef" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" defaultlocale="en-US">
+<widget xmlns:cdv="http://cordova.apache.org/ns/1.0" xmlns:vs="http://schemas.microsoft.com/appx/2014/htmlapps" id="ilisttest.com" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" defaultlocale="en-US">
   <name>IListApp</name>
   <description>A blank project that uses Apache Cordova to help you build an app that targets multiple mobile platforms: Android, iOS, Windows, and Windows Phone.</description>
   <author href="http://cordova.io" email="dev@cordova.apache.org">Apache Cordova Team</author>
   <content src="index.html" />
   <access origin="*" />
   <access origin="ynet.co.il" />
-
   <vs:features />
   <preference name="SplashScreen" value="screen" />
   <preference name="windows-target-version" value="8.1" />
   <preference name="stay-in-webview" value="true" />
-
   <!-- Support for Cordova 5.0.0 plugin system -->
   <plugin name="cordova-plugin-whitelist" version="1" />
   <allow-intent href="http://*/*" />
@@ -111,4 +109,8 @@
   <vs:plugin name="cordova-plugin-inappbrowser" version="1.2.0" />
   <vs:plugin name="cordova-plugin-splashscreen" version="3.1.0" />
   <vs:plugin name="nl.x-services.plugins.socialsharing" version="5.0.6" src="https://github.com/Telerik-Verified-Plugins/SocialSharing" />
+  <vs:plugin name="com.phonegap.plugins.facebookconnect" version="1.0.1.1" src="C:\Users\sagi\Desktop\Facebook-master">
+    <param name="APP_ID" value="527471060748105" />
+    <param name="APP_NAME" value="ilisttest.com" />
+  </vs:plugin>
 </widget>

@@ -31,5 +31,16 @@
         },
         "is_top_level": true,
         "variables": {}
+    },
+    "com.phonegap.plugins.facebookconnect": {
+        "source": {
+            "type": "local",
+            "path": "C:\\Users\\sagi\\Desktop\\Facebook-master"
+        },
+        "is_top_level": true,
+        "variables": {
+            "APP_ID": "527471060748105",
+            "APP_NAME": "ilisttest.com"
+        }
     }
 }

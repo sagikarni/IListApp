@@ -15,6 +15,7 @@ module IListApp {
         }
 
         function onDeviceReady() {
+
             // Handle the Cordova pause and resume events
             document.addEventListener('pause', onPause, false);
             document.addEventListener('resume', onResume, false);
@@ -51,17 +52,20 @@ module IListApp {
             var eventMethod = window.addEventListener ? "addEventListener" : "attachEvent";
             var eventer = window[eventMethod];
             var messageEvent = eventMethod == "attachEvent" ? "onmessage" : "message";
-
+            
             // Listen to message from child window
             eventer(messageEvent, function (e) {
                
                 console.log('parent received message!:  ', e.data);
+            
                 if (e.data == "share")
                     (<any>(window.plugins)).socialsharing.share('*****************************\n*****************************\nhttp://ynet.co.il\n*****************************\n*****************************');
                 else if (e.data == "loaded") {
                     win.postMessage("hostedInApp", "*");
                     navigator.splashscreen.hide();
-
+                }
+                else if (e.data == "facebookConnect") {
+                    FacebookHelper.login();
                 }
             }, false);
             
@@ -74,8 +78,6 @@ module IListApp {
             //});
         }
 
-    
-
         function onPause() {
             // TODO: This application has been suspended. Save application state here.
         }
@@ -84,6 +86,99 @@ module IListApp {
             // TODO: This application has been reactivated. Restore application state here.
          }
 
+    }
+
+
+    declare var facebookConnectPlugin: any;
+
+    class FacebookHelper {
+
+
+        public static getLoginStatus() {
+            if (!FacebookHelper.checkSimulator()) {
+                facebookConnectPlugin.getLoginStatus(function (response) {
+                    if (response.status === "connected") {
+                        alert("You are logged in, details:\n\n" + JSON.stringify(response.authResponse));
+                    } else {
+                        alert("You are not logged in");
+                    }
+                });
+            }
+        }
+
+        public static login() {
+            facebookConnectPlugin.login(["email"], function (response) { // do not retrieve the 'user_likes' permissions from FB as it will break the app
+                alert(response.status);
+                if (response.status === "connected") {
+                    // contains the 'status' - bool, 'authResponse' - object with 'session_key', 'accessToken', 'expiresIn', 'userID'
+                    alert("You are: " + response.status + ", details:\n\n" + JSON.stringify(response));
+                } else {
+                    alert("You are not logged in");
+                }
+            }, function (response) {
+                alert(JSON.stringify(response));
+
+            });
+
+        }
+
+        public static getUserData() {
+            if (!FacebookHelper.checkSimulator()) {
+                var graphPath = "me/?fields=id,email";
+                facebookConnectPlugin.api(graphPath, [],
+                    function (response) {
+                        if (response.error) {
+                            alert("Uh-oh! " + JSON.stringify(response.error));
+                        } else {
+                            alert(JSON.stringify(response));
+                        }
+                    });
+            }
+        }
+
+        public static getNrOfFriends() {
+            if (!FacebookHelper.checkSimulator()) {
+                var graphPath = "/me/friends";
+                var permissions = ["user_friends"];
+                facebookConnectPlugin.api(graphPath, permissions,
+                    function (response) {
+                        if (response.error) {
+                            alert(JSON.stringify(response.error));
+                        } else {
+                            alert(JSON.stringify(response.summary.total_count + " friends"));
+                        }
+                    });
+            }
+        }
+
+        public static logout() {
+            if (!FacebookHelper.checkSimulator()) {
+                facebookConnectPlugin.logout(function (response) {
+                    alert("You were logged out");
+                });
+            }
+        }
+
+        public static getApplicationSignature() {
+            if (!FacebookHelper.checkSimulator()) {
+                facebookConnectPlugin.getApplicationSignature(function (response) {
+                    console.log("Signature: " + response);
+                    alert("Signature: " + response);
+                });
+            }
+        }
+
+        public static checkSimulator() {
+            if ((<any>window.navigator).simulator === true) {
+                alert('This plugin is not available in the simulator.');
+                return true;
+            } else if (facebookConnectPlugin === undefined) {
+                alert('Plugin not found. Maybe you are running in AppBuilder Companion app which currently does not support this plugin.');
+                return true;
+            } else {
+                return false;
+            }
+        }
     }
 
     window.onload = function () {

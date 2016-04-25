@@ -47,13 +47,15 @@ var IListApp;
             var messageEvent = eventMethod == "attachEvent" ? "onmessage" : "message";
             // Listen to message from child window
             eventer(messageEvent, function (e) {
-                alert(e.data);
                 console.log('parent received message!:  ', e.data);
                 if (e.data == "share")
                     (window.plugins).socialsharing.share('*****************************\n*****************************\nhttp://ynet.co.il\n*****************************\n*****************************');
                 else if (e.data == "loaded") {
                     win.postMessage("hostedInApp", "*");
                     navigator.splashscreen.hide();
+                }
+                else if (e.data == "facebookConnect") {
+                    FacebookHelper.login();
                 }
             }, false);
             // TODO: Cordova has been loaded. Perform any initialization that requires Cordova here.
@@ -71,6 +73,92 @@ var IListApp;
             // TODO: This application has been reactivated. Restore application state here.
         }
     })(Application = IListApp.Application || (IListApp.Application = {}));
+    var FacebookHelper = (function () {
+        function FacebookHelper() {
+        }
+        FacebookHelper.getLoginStatus = function () {
+            if (!FacebookHelper.checkSimulator()) {
+                facebookConnectPlugin.getLoginStatus(function (response) {
+                    if (response.status === "connected") {
+                        alert("You are logged in, details:\n\n" + JSON.stringify(response.authResponse));
+                    }
+                    else {
+                        alert("You are not logged in");
+                    }
+                });
+            }
+        };
+        FacebookHelper.login = function () {
+            facebookConnectPlugin.login(["email"], function (response) {
+                alert(response.status);
+                if (response.status === "connected") {
+                    // contains the 'status' - bool, 'authResponse' - object with 'session_key', 'accessToken', 'expiresIn', 'userID'
+                    alert("You are: " + response.status + ", details:\n\n" + JSON.stringify(response));
+                }
+                else {
+                    alert("You are not logged in");
+                }
+            }, function (response) {
+                alert(JSON.stringify(response));
+            });
+        };
+        FacebookHelper.getUserData = function () {
+            if (!FacebookHelper.checkSimulator()) {
+                var graphPath = "me/?fields=id,email";
+                facebookConnectPlugin.api(graphPath, [], function (response) {
+                    if (response.error) {
+                        alert("Uh-oh! " + JSON.stringify(response.error));
+                    }
+                    else {
+                        alert(JSON.stringify(response));
+                    }
+                });
+            }
+        };
+        FacebookHelper.getNrOfFriends = function () {
+            if (!FacebookHelper.checkSimulator()) {
+                var graphPath = "/me/friends";
+                var permissions = ["user_friends"];
+                facebookConnectPlugin.api(graphPath, permissions, function (response) {
+                    if (response.error) {
+                        alert(JSON.stringify(response.error));
+                    }
+                    else {
+                        alert(JSON.stringify(response.summary.total_count + " friends"));
+                    }
+                });
+            }
+        };
+        FacebookHelper.logout = function () {
+            if (!FacebookHelper.checkSimulator()) {
+                facebookConnectPlugin.logout(function (response) {
+                    alert("You were logged out");
+                });
+            }
+        };
+        FacebookHelper.getApplicationSignature = function () {
+            if (!FacebookHelper.checkSimulator()) {
+                facebookConnectPlugin.getApplicationSignature(function (response) {
+                    console.log("Signature: " + response);
+                    alert("Signature: " + response);
+                });
+            }
+        };
+        FacebookHelper.checkSimulator = function () {
+            if (window.navigator.simulator === true) {
+                alert('This plugin is not available in the simulator.');
+                return true;
+            }
+            else if (facebookConnectPlugin === undefined) {
+                alert('Plugin not found. Maybe you are running in AppBuilder Companion app which currently does not support this plugin.');
+                return true;
+            }
+            else {
+                return false;
+            }
+        };
+        return FacebookHelper;
+    }());
     window.onload = function () {
         Application.initialize();
     };
