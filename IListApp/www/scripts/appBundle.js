@@ -2,11 +2,6 @@
 // http://go.microsoft.com/fwlink/?LinkID=397705
 // To debug code on page load in Ripple or on Android devices/emulators: launch your app, set breakpoints, 
 // and then run "window.location.reload()" in the JavaScript Console.
-var AppSettings = (function () {
-    function AppSettings() {
-    }
-    return AppSettings;
-}());
 var IListApp;
 (function (IListApp) {
     "use strict";
@@ -20,7 +15,26 @@ var IListApp;
             // Handle the Cordova pause and resume events
             document.addEventListener('pause', onPause, false);
             document.addEventListener('resume', onResume, false);
-            //  navigator.splashscreen.show();
+            App.init();
+            // TODO: Cordova has been loaded. Perform any initialization that requires Cordova here.
+            //AppSettings.browser = window.open('http://192.168.1.11:9876/default.aspx', '_blank', 'titlebar=no,toolbar=no,location=no,status=no,menubar=no,scrollbars=no,resizable=no');
+            //navigator.splashscreen.show();
+            //AppSettings.browser.addEventListener("loadstop", function () {
+            //    navigator.splashscreen.hide();
+            //    pollForSocialShare();
+            //});
+        }
+        function onPause() {
+            // TODO: This application has been suspended. Save application state here.
+        }
+        function onResume() {
+            // TODO: This application has been reactivated. Restore application state here.
+        }
+    })(Application = IListApp.Application || (IListApp.Application = {}));
+    var App = (function () {
+        function App() {
+        }
+        App.init = function () {
             var iframe = document.createElement('iframe');
             iframe.src = "http://192.168.1.11:9876/default.aspx";
             iframe.width = "100%"; //window.outerWidth.toString();
@@ -41,70 +55,46 @@ var IListApp;
             iframe.scrolling = "false";
             iframe.id = "iframe";
             document.body.appendChild(iframe);
-            var win = iframe.contentWindow;
+            App.win = iframe.contentWindow;
             var eventMethod = window.addEventListener ? "addEventListener" : "attachEvent";
             var eventer = window[eventMethod];
             var messageEvent = eventMethod == "attachEvent" ? "onmessage" : "message";
             // Listen to message from child window
             eventer(messageEvent, function (e) {
-                var crossDoaminMessage = e.data;
-                console.log('parent received message!:  ', e.data);
-                if (crossDoaminMessage.messageType == MessageType.WhatsUpShare)
-                    (window.plugins).socialsharing.share('*****************************\n*****************************\nhttp://ynet.co.il\n*****************************\n*****************************');
-                else if (crossDoaminMessage.messageType == MessageType.DocumentLoaded) {
-                    win.postMessage(CrossDoaminMessage.CreateMessageWithoutContent(MessageType.IsHostedInApp), "*");
-                    navigator.splashscreen.hide();
-                }
-                else if (crossDoaminMessage.messageType == MessageType.FacebookLogin) {
-                    FacebookHelper.login();
-                }
+                CrossDomainCommunicationMgr.receiveMessage(e);
             }, false);
-            // TODO: Cordova has been loaded. Perform any initialization that requires Cordova here.
-            //AppSettings.browser = window.open('http://192.168.1.11:9876/default.aspx', '_blank', 'titlebar=no,toolbar=no,location=no,status=no,menubar=no,scrollbars=no,resizable=no');
-            //navigator.splashscreen.show();
-            //AppSettings.browser.addEventListener("loadstop", function () {
-            //    navigator.splashscreen.hide();
-            //    pollForSocialShare();
-            //});
+        };
+        return App;
+    }());
+    var FacebookLoginResponse = (function () {
+        function FacebookLoginResponse() {
         }
-        function onPause() {
-            // TODO: This application has been suspended. Save application state here.
+        return FacebookLoginResponse;
+    }());
+    var FacebookAuthResponse = (function () {
+        function FacebookAuthResponse() {
         }
-        function onResume() {
-            // TODO: This application has been reactivated. Restore application state here.
+        return FacebookAuthResponse;
+    }());
+    var FacebookNative = (function () {
+        function FacebookNative() {
         }
-    })(Application = IListApp.Application || (IListApp.Application = {}));
-    var FacebookHelper = (function () {
-        function FacebookHelper() {
-        }
-        FacebookHelper.getLoginStatus = function () {
-            if (!FacebookHelper.checkSimulator()) {
+        FacebookNative.getLoginStatus = function () {
+            if (!FacebookNative.checkSimulator()) {
                 facebookConnectPlugin.getLoginStatus(function (response) {
-                    if (response.status === "connected") {
-                        alert("You are logged in, details:\n\n" + JSON.stringify(response.authResponse));
-                    }
-                    else {
-                        alert("You are not logged in");
-                    }
+                    CrossDomainCommunicationMgr.sendMessageWithContent(MessageType.FacebookStatusResponse, response);
                 });
             }
         };
-        FacebookHelper.login = function () {
-            facebookConnectPlugin.login(["email"], function (response) {
-                alert(response.status);
-                if (response.status === "connected") {
-                    // contains the 'status' - bool, 'authResponse' - object with 'session_key', 'accessToken', 'expiresIn', 'userID'
-                    alert("You are: " + response.status + ", details:\n\n" + JSON.stringify(response));
-                }
-                else {
-                    alert("You are not logged in");
-                }
+        FacebookNative.login = function () {
+            facebookConnectPlugin.login(["public_profile", "email"], function (response) {
+                CrossDomainCommunicationMgr.sendMessageWithContent(MessageType.FacebookLoginResponse, response);
             }, function (response) {
                 alert(JSON.stringify(response));
             });
         };
-        FacebookHelper.getUserData = function () {
-            if (!FacebookHelper.checkSimulator()) {
+        FacebookNative.getUserData = function () {
+            if (!FacebookNative.checkSimulator()) {
                 var graphPath = "me/?fields=id,email";
                 facebookConnectPlugin.api(graphPath, [], function (response) {
                     if (response.error) {
@@ -116,8 +106,8 @@ var IListApp;
                 });
             }
         };
-        FacebookHelper.getNrOfFriends = function () {
-            if (!FacebookHelper.checkSimulator()) {
+        FacebookNative.getNrOfFriends = function () {
+            if (!FacebookNative.checkSimulator()) {
                 var graphPath = "/me/friends";
                 var permissions = ["user_friends"];
                 facebookConnectPlugin.api(graphPath, permissions, function (response) {
@@ -130,22 +120,22 @@ var IListApp;
                 });
             }
         };
-        FacebookHelper.logout = function () {
-            if (!FacebookHelper.checkSimulator()) {
+        FacebookNative.logout = function () {
+            if (!FacebookNative.checkSimulator()) {
                 facebookConnectPlugin.logout(function (response) {
                     alert("You were logged out");
                 });
             }
         };
-        FacebookHelper.getApplicationSignature = function () {
-            if (!FacebookHelper.checkSimulator()) {
+        FacebookNative.getApplicationSignature = function () {
+            if (!FacebookNative.checkSimulator()) {
                 facebookConnectPlugin.getApplicationSignature(function (response) {
                     console.log("Signature: " + response);
                     alert("Signature: " + response);
                 });
             }
         };
-        FacebookHelper.checkSimulator = function () {
+        FacebookNative.checkSimulator = function () {
             if (window.navigator.simulator === true) {
                 alert('This plugin is not available in the simulator.');
                 return true;
@@ -158,29 +148,64 @@ var IListApp;
                 return false;
             }
         };
-        return FacebookHelper;
+        return FacebookNative;
     }());
+    //#endregion
+    //#region Messaging
     var MessageType;
     (function (MessageType) {
         MessageType[MessageType["DocumentLoaded"] = 1] = "DocumentLoaded";
         MessageType[MessageType["IsHostedInApp"] = 2] = "IsHostedInApp";
-        MessageType[MessageType["WhatsUpShare"] = 3] = "WhatsUpShare";
-        MessageType[MessageType["FacebookLogin"] = 4] = "FacebookLogin";
+        MessageType[MessageType["Socialsharing"] = 3] = "Socialsharing";
+        MessageType[MessageType["FacebookLoginRequest"] = 4] = "FacebookLoginRequest";
+        MessageType[MessageType["FacebookLoginResponse"] = 5] = "FacebookLoginResponse";
+        MessageType[MessageType["FacebookStatusRequest"] = 6] = "FacebookStatusRequest";
+        MessageType[MessageType["FacebookStatusResponse"] = 7] = "FacebookStatusResponse";
     })(MessageType || (MessageType = {}));
-    var CrossDoaminMessage = (function () {
-        function CrossDoaminMessage(messageType) {
+    var CrossDomainCommunicationMgr = (function () {
+        function CrossDomainCommunicationMgr() {
+        }
+        CrossDomainCommunicationMgr.sendMessage = function (messageType) {
+            App.win.postMessage(CrossDomainMessage.CreateMessageWithoutContent(messageType), "*");
+        };
+        CrossDomainCommunicationMgr.sendMessageWithContent = function (messageType, msg) {
+            App.win.postMessage(CrossDomainMessage.CreateMessageContent(messageType, msg), "*");
+        };
+        CrossDomainCommunicationMgr.receiveMessage = function (event) {
+            var crossDomainMessage = event.data;
+            switch (crossDomainMessage.messageType) {
+                case MessageType.Socialsharing:
+                    (window.plugins).socialsharing.share('*****************************\n*****************************\nhttp://ynet.co.il\n*****************************\n*****************************');
+                    break;
+                case MessageType.DocumentLoaded:
+                    CrossDomainCommunicationMgr.sendMessage(MessageType.IsHostedInApp);
+                    navigator.splashscreen.hide();
+                    break;
+                case MessageType.FacebookStatusRequest:
+                    FacebookNative.getLoginStatus();
+                    break;
+                case MessageType.FacebookLoginRequest:
+                    FacebookNative.login();
+                    break;
+            }
+        };
+        return CrossDomainCommunicationMgr;
+    }());
+    var CrossDomainMessage = (function () {
+        function CrossDomainMessage(messageType) {
             this.messageType = messageType;
         }
-        CrossDoaminMessage.CreateMessageWithoutContent = function (messageType) {
-            return new CrossDoaminMessage(messageType);
+        CrossDomainMessage.CreateMessageWithoutContent = function (messageType) {
+            return new CrossDomainMessage(messageType);
         };
-        CrossDoaminMessage.CreateMessageContent = function (messageType, content) {
-            var crossDoaminMessage = new CrossDoaminMessage(messageType);
+        CrossDomainMessage.CreateMessageContent = function (messageType, content) {
+            var crossDoaminMessage = new CrossDomainMessage(messageType);
             crossDoaminMessage.content = content;
             return crossDoaminMessage;
         };
-        return CrossDoaminMessage;
+        return CrossDomainMessage;
     }());
+    //#endregion
     window.onload = function () {
         Application.initialize();
     };
