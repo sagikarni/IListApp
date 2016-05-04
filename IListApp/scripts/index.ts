@@ -100,6 +100,7 @@ module IListApp {
                 });
             }
         }
+
         public static login() {
             facebookConnectPlugin.login(["public_profile", "email"], function (response) { // do not retrieve the 'user_likes' permissions from FB as it will break the app
                 CrossDomainCommunicationMgr.sendMessageWithContent(MessageType.FacebookLoginResponse, response);
