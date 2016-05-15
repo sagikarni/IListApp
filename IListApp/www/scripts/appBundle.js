@@ -175,7 +175,8 @@ var IListApp;
             var crossDomainMessage = event.data;
             switch (crossDomainMessage.messageType) {
                 case MessageType.Socialsharing:
-                    (window.plugins).socialsharing.share('*****************************\n*****************************\nhttp://ynet.co.il\n*****************************\n*****************************');
+                    var data = crossDomainMessage.content;
+                    (window.plugins).socialsharing.share(data.body, data.title, null, null);
                     break;
                 case MessageType.DocumentLoaded:
                     CrossDomainCommunicationMgr.sendMessage(MessageType.IsHostedInApp);
@@ -204,6 +205,11 @@ var IListApp;
             return crossDoaminMessage;
         };
         return CrossDomainMessage;
+    }());
+    var SharingInfo = (function () {
+        function SharingInfo() {
+        }
+        return SharingInfo;
     }());
     //#endregion
     window.onload = function () {

@@ -38,7 +38,6 @@ module IListApp {
 
     }
 
-
     class App {
         public static win: Window;
         public static init() {
@@ -55,7 +54,6 @@ module IListApp {
             iframe.style.border = "none";
             iframe.style.margin = "0px";
             iframe.style.padding = "0px";
-            iframe.style.backgroundColor = "red";
             iframe.id = "iframe";
             iframe.vspace = 0;
             iframe.marginHeight = "0px";
@@ -75,7 +73,6 @@ module IListApp {
             }, false);
         }
     }
-
 
     //#region Facebook
     declare var facebookConnectPlugin: any;
@@ -170,10 +167,9 @@ module IListApp {
     }
 
     //#endregion
-   
-
-
+ 
     //#region Messaging
+    
     enum MessageType {
         DocumentLoaded = 1,
         IsHostedInApp = 2,
@@ -202,7 +198,8 @@ module IListApp {
             var crossDomainMessage = <CrossDomainMessage>event.data;
             switch (crossDomainMessage.messageType) {
                 case MessageType.Socialsharing:
-                    (<any>(window.plugins)).socialsharing.share('*****************************\n*****************************\nhttp://ynet.co.il\n*****************************\n*****************************');
+                    var data = <SharingInfo>crossDomainMessage.content;
+                    (<any>(window.plugins)).socialsharing.share(data.body,  data.title, null, null);
                     break;
                 case MessageType.DocumentLoaded:
                     CrossDomainCommunicationMgr.sendMessage(MessageType.IsHostedInApp);
@@ -236,6 +233,11 @@ module IListApp {
             return crossDoaminMessage;
         }
 
+    }
+
+    class SharingInfo {
+        public title: string;
+        public body: string;
     }
     //#endregion
 
