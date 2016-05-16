@@ -113,4 +113,7 @@
     <param name="APP_ID" value="527471060748105" />
     <param name="APP_NAME" value="ilisttest.com" />
   </vs:plugin>
+  <vs:plugin name="nl.x-services.plugins.launchmyapp" version="4.1.4" src="https://github.com/Telerik-Verified-Plugins/Custom-URL-scheme">
+    <param name="URL_SCHEME" value="ilist" />
+  </vs:plugin>
 </widget>

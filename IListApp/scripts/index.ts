@@ -3,7 +3,15 @@
 // To debug code on page load in Ripple or on Android devices/emulators: launch your app, set breakpoints, 
 // and then run "window.location.reload()" in the JavaScript Console.
 
-
+// If you need to access Cordova functions inside this function, make sure 'deviceready' has fired
+function handleOpenURL(url) {
+    // Wrapping in a little timeout, so it doesn't interfere with other app setup stuff
+    setTimeout(function () {
+        // The url will include your URL scheme.
+        // Extract the path and params like you'd do with any other URL.
+        alert("App launch URL:\n" + url);
+    }, 300);
+};
 module IListApp {
     "use strict";
 

@@ -2,6 +2,16 @@
 // http://go.microsoft.com/fwlink/?LinkID=397705
 // To debug code on page load in Ripple or on Android devices/emulators: launch your app, set breakpoints, 
 // and then run "window.location.reload()" in the JavaScript Console.
+// If you need to access Cordova functions inside this function, make sure 'deviceready' has fired
+function handleOpenURL(url) {
+    // Wrapping in a little timeout, so it doesn't interfere with other app setup stuff
+    setTimeout(function () {
+        // The url will include your URL scheme.
+        // Extract the path and params like you'd do with any other URL.
+        alert("App launch URL:\n" + url);
+    }, 300);
+}
+;
 var IListApp;
 (function (IListApp) {
     "use strict";
@@ -48,7 +58,6 @@ var IListApp;
             iframe.style.border = "none";
             iframe.style.margin = "0px";
             iframe.style.padding = "0px";
-            iframe.style.backgroundColor = "red";
             iframe.id = "iframe";
             iframe.vspace = 0;
             iframe.marginHeight = "0px";

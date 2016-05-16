@@ -42,5 +42,16 @@
             "APP_ID": "527471060748105",
             "APP_NAME": "ilisttest.com"
         }
+    },
+    "nl.x-services.plugins.launchmyapp": {
+        "source": {
+            "type": "git",
+            "url": "https://github.com/Telerik-Verified-Plugins/Custom-URL-scheme",
+            "subdir": "."
+        },
+        "is_top_level": true,
+        "variables": {
+            "URL_SCHEME": "ilist"
+        }
     }
 }
